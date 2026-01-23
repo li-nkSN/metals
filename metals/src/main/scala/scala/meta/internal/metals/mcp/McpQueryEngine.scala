@@ -460,18 +460,18 @@ object McpQueryEngine {
    * Meta-targets like "root-build" don't have project dependencies and should
    * be excluded from smart fallback selection.
    *
-   * Uses two checks:
-   * 1. Primary: ScalaTarget's sbtVersion when available (more reliable per Metals devs)
-   * 2. Fallback: URI pattern for targets without ScalaTarget entry
+   * Uses ScalaTarget's sbtVersion when available.
+   * NOTE: URI pattern check removed - see demo project for cases where this may be insufficient.
    */
   def isBuildMetaTarget(
       buildTargets: BuildTargets,
       id: BuildTargetIdentifier,
   ): Boolean = {
-    val isSbtBuild = buildTargets.scalaTarget(id).exists(_.sbtVersion.isDefined)
-    val uri = id.getUri
-    val uriBuildPattern = uri.contains("-build") || uri.endsWith("root-build")
-    isSbtBuild || uriBuildPattern
+    buildTargets.scalaTarget(id).exists(_.sbtVersion.isDefined)
+    // URI pattern fallback commented out to demonstrate limitation of sbtVersion-only check:
+    // val uri = id.getUri
+    // val uriBuildPattern = uri.contains("-build") || uri.endsWith("root-build")
+    // isSbtBuild || uriBuildPattern
   }
 
   /**
